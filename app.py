@@ -11,12 +11,18 @@ st.set_page_config(
 )
 
 def load_environment():
-    """Charge les variables d'environnement et vérifie la clé API"""
-    load_dotenv()
+    """Charge la clé depuis le Cloud (st.secrets) OU depuis le local (.env)"""
     
+    # 1. On regarde d'abord si la clé est dans les "Secrets" du Cloud Streamlit
+    if "MISTRAL_API_KEY" in st.secrets:
+        return st.secrets["MISTRAL_API_KEY"]
+
+    # 2. Sinon, on regarde en local (fichier .env)
+    load_dotenv()
     api_key = os.getenv("MISTRAL_API_KEY")
+    
     if not api_key:
-        st.error("❌ Clé API Mistral non trouvée. Veuillez créer un fichier .env avec votre MISTRAL_API_KEY")
+        st.error("❌ Clé API introuvable. Configurez les Secrets (Cloud) ou le .env (Local).")
         st.stop()
     
     return api_key
